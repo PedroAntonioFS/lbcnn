@@ -13,6 +13,16 @@ class TestSubLayer(LBCSubLayer):
     def calculate(self, x, weights):
         return x
 
+class FirstSubLayerLBC2D(LBCSubLayer):
+    def __init__(self, strides=1, padding='SAME'):
+        self.strides = [strides, strides, strides, strides]
+        self.padding = padding
+
+    def calculate(self, x, weights):
+        filter = tf.constant(weights)
+        feature_map = tf.raw_ops.Conv2D(input=x,filter=filter,strides=self.strides, padding=self.padding)
+        return feature_map
+
 class LBC(tf.keras.layers.Layer):
     
     def __init__(self, rank, anchor_weights, sublayer1, sublayer2, strides=1, padding='valid', activation='relu'):
