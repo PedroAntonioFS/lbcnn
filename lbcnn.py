@@ -22,6 +22,15 @@ class FirstSubLayerLBC2D(LBCSubLayer):
         filter = tf.constant(weights)
         feature_map = tf.raw_ops.Conv2D(input=x,filter=filter,strides=self.strides, padding=self.padding)
         return feature_map
+    
+class SecondSubLayerLBC2D(LBCSubLayer):
+    def __init__(self, strides=1, padding='SAME'):
+        self.strides = [strides, strides, strides, strides]
+        self.padding = padding
+        
+    def calculate(self, x, weights):
+        feature_map = tf.raw_ops.Conv2D(input=x,filter=weights,strides=self.strides, padding=self.padding)
+        return feature_map
 
 class LBC(tf.keras.layers.Layer):
     
