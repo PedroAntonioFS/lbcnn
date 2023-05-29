@@ -17,7 +17,7 @@ class UnitTestLBC(unittest.TestCase):
         lbc = LBC(2, anchor_weights, test_sub_layer1, test_sub_layer2)
         x = np.array([ [1,2,3,4], [5,-6,7,8], [9,8,7,6], [5,4,3,-2] ])
         y = np.array([ [1,2,3,4], [5,0,7,8], [9,8,7,6], [5,4,3,0] ])
-        expected_output = tf.constant(np.array([ [1,2,3,4], [5,0,7,8], [9,8,7,6], [5,4,3,0] ]))
+        expected_output = tf.constant(y)
         real_output = lbc(x)
 
         tf.debugging.assert_equal(expected_output, real_output)
@@ -76,4 +76,26 @@ class UnitTestLBC(unittest.TestCase):
              ]
             ])
         real_y = sub_layer.calculate(x, anchor_weights).numpy()
+        self.assertTrue(np.array_equal(expected_y, real_y))
+
+    def test_SubLayer2(self):
+        sub_layer = SecondSubLayerLBC2D()
+        intermediary_feature_map = np.array([
+            [
+                [[14, -4],   [18, -6],    [22, -8],   [8, 0]], 
+                [[26, -12],  [26, -14],   [26, -16],   [16, 0]], 
+                [[26, -16],  [22, -14],   [18, -12],    [12, 0]], 
+                [[10, -8],   [8, -6],    [6, -4],    [4, 0]]
+             ]
+            ])
+        x = tf.constant(intermediary_feature_map)
+        filters = np.array([[[[1],[2]]]])
+        real_y = sub_layer.calculate(x, filters).numpy()
+        expected_y = np.array([[
+                [[6],   [6],    [6],    [8]],
+                [[2],   [-2],   [-6],   [16]],
+                [[-6],  [-6],   [-6],  [12]],
+                [[-6],  [-4],   [-2],   [4]]
+            ]])
+        
         self.assertTrue(np.array_equal(expected_y, real_y))
