@@ -33,7 +33,7 @@ class LBC(tf.keras.layers.Layer):
         self.rank = rank
         self.kernel_size = kernel_size
         self.anchor_weights = tf.Variable(initial_value=anchor_weights, trainable=False)
-        self.filters = anchor_weights.shape[0]
+        self.filters = anchor_weights.shape[-1]
         self.strides = conv_utils.normalize_tuple(strides, rank, 'strides')
         self.padding = conv_utils.normalize_padding(padding)
         self.activation = activations.get(activation)
@@ -59,7 +59,7 @@ class LBC2D(LBC):
         sub_layer1 = SubLayerLBC2D(strides=strides, padding=padding.upper())
         sub_layer2 = SubLayerLBC2D(strides=1, padding='SAME')
         self.validate_anchor_weights(anchor_weights)
-        super(LBC2D, self).__init__(rank=1, anchor_weights=anchor_weights, kernel_size=(1,1), sub_layer1=sub_layer1, sub_layer2=sub_layer2, strides=strides, padding=padding, activation='relu', kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, activity_regularizer=activity_regularizer, kernel_constraint=kernel_constraint, **kwargs)
+        super(LBC2D, self).__init__(rank=2, anchor_weights=anchor_weights, kernel_size=(1,1), sub_layer1=sub_layer1, sub_layer2=sub_layer2, strides=strides, padding=padding, activation='relu', kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, activity_regularizer=activity_regularizer, kernel_constraint=kernel_constraint, **kwargs)
 
     def validate_anchor_weights(self, anchor_weights):
         if anchor_weights.max() > 1 or anchor_weights.max() < -1:
