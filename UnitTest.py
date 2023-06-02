@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+from tensorflow import keras
 from lbcnn import *
 
 class UnitTestLBC(unittest.TestCase):
@@ -105,3 +106,22 @@ class UnitTestLBC(unittest.TestCase):
             self.fail("LBC should only accept ternary values (-1, 0 or 1)")
         except ValueError:
             pass
+
+    def test_MNIST(self):
+        anchor_weights = np.array(
+                    [
+                        [[[1,0,0,0,1,0,0,0]],[[1,0,0,0,0,1,0,0]],[[1,0,0,0,0,0,1,0]],[[1,0,0,0,0,0,0,1]]],
+                        [[[0,1,0,0,1,0,0,0]],[[0,1,0,0,0,1,0,0]],[[0,1,0,0,0,0,1,0]],[[0,1,0,0,0,0,0,1]]],
+                        [[[0,0,1,0,1,0,0,0]],[[0,0,1,0,0,1,0,0]],[[0,0,1,0,0,0,1,0]],[[0,0,1,0,0,0,0,1]]],
+                        [[[0,0,0,1,1,0,0,0]],[[0,0,0,1,0,1,0,0]],[[0,0,0,1,0,0,1,0]],[[0,0,0,1,0,0,0,1]]]
+                        
+                    ], dtype=np.float32
+                )
+        fashion_mnist = keras.datasets.fashion_mnist
+
+        (train_images, _), (_, _) = fashion_mnist.load_data()
+        train_images = train_images.astype('float32')
+        train_images = np.reshape(train_images, (train_images.shape[0], train_images.shape[1], train_images.shape[2], 1))
+
+        lbc = LBC2D(anchor_weights, padding='SAME')
+        _ = lbc(train_images).numpy()
