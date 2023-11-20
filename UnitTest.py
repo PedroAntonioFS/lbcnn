@@ -15,7 +15,7 @@ class UnitTestLBC(unittest.TestCase):
                 [[5,6],[7,8]]
             ]
         )
-        lbc = LBC(1, anchor_weights, (1,), test_sub_layer1, test_sub_layer2)
+        lbc = LBC(1, anchor_weights, 1, (1,), test_sub_layer1, test_sub_layer2)
         x = np.array([ [1,2,3,4], [5,-6,7,8], [9,8,7,6], [5,4,3,-2] ])
         y = np.array([ [1,2,3,4], [5,0,7,8], [9,8,7,6], [5,4,3,0] ])
         expected_output = tf.constant(y)
@@ -89,9 +89,29 @@ class UnitTestLBC(unittest.TestCase):
                 
             ], dtype=np.float32
         )
-        lbc = LBC2D(anchor_weights, padding='SAME')
+        lbc = LBC2D(anchor_weights, 1, padding='SAME')
         y = lbc(x).numpy()
         self.assertEqual(y.shape, (1,4,4,1))
+
+    def test_LBC2D_2_out_channels(self):
+        x = np.array([
+            [ 
+                [[1,1],[2,2],[3,3],[4,4]], 
+                [[5,5],[6,6],[7,7],[8,8]], 
+                [[9,9],[8,8],[7,7],[6,6]], 
+                [[5,5],[4,4],[3,3],[2,2]]
+            ]
+            ], dtype=np.float32)
+        anchor_weights = np.array(
+            [
+                [[[1,0],[1,0]],[[0,-1], [0,-1]]],
+                [[[0,0],[0,0]],[[1,0],  [1,0]]]
+                
+            ], dtype=np.float32
+        )
+        lbc = LBC2D(anchor_weights, 2, padding='SAME')
+        y = lbc(x).numpy()
+        self.assertEqual(y.shape, (1,4,4,2))
 
     def test_LBC2D_non_binary_anchor_weights(self):
         anchor_weights = np.array(
@@ -102,7 +122,7 @@ class UnitTestLBC(unittest.TestCase):
             ], dtype=np.float32
         )
         try:
-            LBC2D(anchor_weights, padding='SAME')
+            LBC2D(anchor_weights, 1, padding='SAME')
             self.fail("LBC should only accept ternary values (-1, 0 or 1)")
         except ValueError:
             pass
@@ -123,5 +143,5 @@ class UnitTestLBC(unittest.TestCase):
         train_images = train_images.astype('float32')
         train_images = np.reshape(train_images, (train_images.shape[0], train_images.shape[1], train_images.shape[2], 1))
 
-        lbc = LBC2D(anchor_weights, padding='SAME')
+        lbc = LBC2D(anchor_weights, 1, padding='SAME')
         _ = lbc(train_images).numpy()
